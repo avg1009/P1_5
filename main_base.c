@@ -49,7 +49,6 @@
 
 #include <stdio.h>
 #include <pthread.h>
-#include <stdlib.h>
 
 /* Kernel includes. */
 #include "FreeRTOS.h"
@@ -62,11 +61,20 @@
 
 /* Priorities at which the tasks are created. */
 #define TASK1_PRIORITY    ( tskIDLE_PRIORITY + 1 )
-#define TASK2_PRIORITY       ( tskIDLE_PRIORITY + 1 )
+#define TASK2_PRIORITY       ( tskIDLE_PRIORITY + 2 )
 
 /* The rate at which data is sent to the queue.  The times are converted from
  * milliseconds to ticks using the pdMS_TO_TICKS() macro. */
-#define FREQUENCY_MS_TASK1         pdMS_TO_TICKS( 5000UL )
+#define FREQUENCY_MS_TASK1         pdMS_TO_TICKS( 2000UL )
+#define FREQUENCY_MS_TASK2         pdMS_TO_TICKS( 10000UL )
+
+
+/* Constantes */
+
+#define Max_Num 20 
+#define Min 0
+#define Max 100
+#define Tam_FileName 6
 
 
 /*-----------------------------------------------------------*/
@@ -76,10 +84,18 @@
  */
 static void prvTask1( void * pvParameters );
 static void prvTask2( void * pvParameters );
+static void prvTask3.1( void * pvParameters );
+static void prvTask3.2( void * pvParameters );
+static void prvTask3.3( void * pvParameters );
+static void prvTask3.4( void * pvParameters );
+static void prvTask3.5( void * pvParameters );
+static void prvTask4( void * pvParameters );
+
+
 
 
 /*-----------------------------------------------------------*/
-QueueHandle_t cola;
+
 /*** SEE THE COMMENTS AT THE TOP OF THIS FILE ***/
 void main_base( void )
 {
@@ -95,8 +111,6 @@ void main_base( void )
 
     xTaskCreate( prvTask2, "Task2", configMINIMAL_STACK_SIZE, NULL, TASK2_PRIORITY, NULL );
 
-
-    cola = xQueueCreate(1,sizeof(int));
 
     /* Start the tasks and get the scheduler running. */
     vTaskStartScheduler();
@@ -117,18 +131,25 @@ static void prvTask1( void * pvParameters )
     /* Prevent the compiler warning about the unused parameter. */
     ( void ) pvParameters;
 
-    int aleatorio;
-    srandom(time(NULL)); // Initialize seed for pseudo-random generator
-
     for( ; ; )
     {
-        aleatorio=random(); // Get an int random number
-        xQueueSend(cola, &aleatorio, portMAX_DELAY);
+
         /* Send to the queue - causing the queue receive task to unblock and
          * write to the console.  0 is used as the block time so the send operation
          * will not block - it shouldn't need to block as the queue should always
          * have at least one space at this point in the code. */
-        console_print( "Task1 (enviado): %d\n", aleatorio );
+        Char nameFile[Tam_FileName +1]; 
+        RandomName(nameFile, Tam_FileName);
+        File *file = fopen (nameFile , "w");
+        if ( file != NULL){
+
+            for ( int i = 0 ; i > Max_Num ; i++){
+                int numero = rand() % (Max - Min +1 )  + Min; 
+
+                fprintf(file , "%d\n",numero )
+            }
+        fclose();
+        }
 
         /* Place this task in the blocked state until it is time to run again.
         *  The block time is specified in ticks, pdMS_TO_TICKS() was used to
@@ -145,16 +166,191 @@ static void prvTask2( void * pvParameters )
     /* Prevent the compiler warning about the unused parameter. */
     ( void ) pvParameters;
 
-    int recibido;
-
     for( ; ; )
     {
-        xQueueReceive(cola, &recibido, portMAX_DELAY);
         /* Send to the queue - causing the queue receive task to unblock and
          * write to the console.  0 is used as the block time so the send operation
          * will not block - it shouldn't need to block as the queue should always
          * have at least one space at this point in the code. */
-        console_print( "Task2 (recibido): %d\n", recibido );
+        console_print( "Message from task 2\n" );
+        for( int i=0 ; i < 1000000 ; i++ )
+        {
+        }
+
+        /* Place this task in the blocked state until it is time to run again.
+        *  The block time is specified in ticks, pdMS_TO_TICKS() was used to
+        *  convert a time specified in milliseconds into a time specified in ticks.
+        *  While in the Blocked state this task will not consume any CPU time. */
+        vTaskDelay( FREQUENCY_MS_TASK2 );
     }
 }
 /*-----------------------------------------------------------*/
+
+static void prvTask3.1( void * pvParameters )
+{
+    /* Prevent the compiler warning about the unused parameter. */
+    ( void ) pvParameters;
+
+    for( ; ; )
+    {
+        /* Send to the queue - causing the queue receive task to unblock and
+         * write to the console.  0 is used as the block time so the send operation
+         * will not block - it shouldn't need to block as the queue should always
+         * have at least one space at this point in the code. */
+        console_print( "Message from task 2\n" );
+        for( int i=0 ; i < 1000000 ; i++ )
+        {
+        }
+
+        /* Place this task in the blocked state until it is time to run again.
+        *  The block time is specified in ticks, pdMS_TO_TICKS() was used to
+        *  convert a time specified in milliseconds into a time specified in ticks.
+        *  While in the Blocked state this task will not consume any CPU time. */
+        vTaskDelay( FREQUENCY_MS_TASK2 );
+    }
+}
+
+/*-----------------------------------------------------------*/
+
+static void prvTask3.2( void * pvParameters )
+{
+    /* Prevent the compiler warning about the unused parameter. */
+    ( void ) pvParameters;
+
+    for( ; ; )
+    {
+        /* Send to the queue - causing the queue receive task to unblock and
+         * write to the console.  0 is used as the block time so the send operation
+         * will not block - it shouldn't need to block as the queue should always
+         * have at least one space at this point in the code. */
+        console_print( "Message from task 2\n" );
+        for( int i=0 ; i < 1000000 ; i++ )
+        {
+        }
+
+        /* Place this task in the blocked state until it is time to run again.
+        *  The block time is specified in ticks, pdMS_TO_TICKS() was used to
+        *  convert a time specified in milliseconds into a time specified in ticks.
+        *  While in the Blocked state this task will not consume any CPU time. */
+        vTaskDelay( FREQUENCY_MS_TASK2 );
+    }
+}
+
+
+/*-----------------------------------------------------------*/
+
+static void prvTask3.3( void * pvParameters )
+{
+    /* Prevent the compiler warning about the unused parameter. */
+    ( void ) pvParameters;
+
+    for( ; ; )
+    {
+        /* Send to the queue - causing the queue receive task to unblock and
+         * write to the console.  0 is used as the block time so the send operation
+         * will not block - it shouldn't need to block as the queue should always
+         * have at least one space at this point in the code. */
+        console_print( "Message from task 2\n" );
+        for( int i=0 ; i < 1000000 ; i++ )
+        {
+        }
+
+
+        /* Place this task in the blocked state until it is time to run again.
+        *  The block time is specified in ticks, pdMS_TO_TICKS() was used to
+        *  convert a time specified in milliseconds into a time specified in ticks.
+        *  While in the Blocked state this task will not consume any CPU time. */
+        vTaskDelay( FREQUENCY_MS_TASK2 );
+    }
+}
+/*-----------------------------------------------------------*/
+
+static void prvTask3.4( void * pvParameters )
+{
+    /* Prevent the compiler warning about the unused parameter. */
+    ( void ) pvParameters;
+
+    for( ; ; )
+    {
+        /* Send to the queue - causing the queue receive task to unblock and
+         * write to the console.  0 is used as the block time so the send operation
+         * will not block - it shouldn't need to block as the queue should always
+         * have at least one space at this point in the code. */
+        console_print( "Message from task 2\n" );
+        for( int i=0 ; i < 1000000 ; i++ )
+        {
+        }
+
+        /* Place this task in the blocked state until it is time to run again.
+        *  The block time is specified in ticks, pdMS_TO_TICKS() was used to
+        *  convert a time specified in milliseconds into a time specified in ticks.
+        *  While in the Blocked state this task will not consume any CPU time. */
+        vTaskDelay( FREQUENCY_MS_TASK2 );
+    }
+}
+/*-----------------------------------------------------------*/
+
+static void prvTask3.5( void * pvParameters )
+{
+    /* Prevent the compiler warning about the unused parameter. */
+    ( void ) pvParameters;
+
+    for( ; ; )
+    {
+        /* Send to the queue - causing the queue receive task to unblock and
+         * write to the console.  0 is used as the block time so the send operation
+         * will not block - it shouldn't need to block as the queue should always
+         * have at least one space at this point in the code. */
+        console_print( "Message from task 2\n" );
+        for( int i=0 ; i < 1000000 ; i++ )
+        {
+        }
+
+        /* Place this task in the blocked state until it is time to run again.
+        *  The block time is specified in ticks, pdMS_TO_TICKS() was used to
+        *  convert a time specified in milliseconds into a time specified in ticks.
+        *  While in the Blocked state this task will not consume any CPU time. */
+        vTaskDelay( FREQUENCY_MS_TASK2 );
+    }
+}
+
+/*-----------------------------------------------------------*/
+
+static void prvTask4( void * pvParameters )
+{
+    /* Prevent the compiler warning about the unused parameter. */
+    ( void ) pvParameters;
+
+    for( ; ; )
+    {
+        /* Send to the queue - causing the queue receive task to unblock and
+         * write to the console.  0 is used as the block time so the send operation
+         * will not block - it shouldn't need to block as the queue should always
+         * have at least one space at this point in the code. */
+        console_print( "Message from task 2\n" );
+        for( int i=0 ; i < 1000000 ; i++ )
+        {
+        }
+
+        /* Place this task in the blocked state until it is time to run again.
+        *  The block time is specified in ticks, pdMS_TO_TICKS() was used to
+        *  convert a time specified in milliseconds into a time specified in ticks.
+        *  While in the Blocked state this task will not consume any CPU time. */
+        vTaskDelay( FREQUENCY_MS_TASK2 );
+    }
+}
+
+
+
+void RandomName(char nameFile*, int tam){
+    const char character[] = "abcdefghijklmnopqrstuvwxyzABCDEFGHIKLMNOPQRSTUVWXYZ" ;
+    int totalChar = sizeof(character) -1 ; 
+    
+
+    for ( int  i ; i < tam ; i++){
+
+        nameFile = character[rand()% totalChar]
+    }
+
+    nameFile[tam] = '\0'
+}
